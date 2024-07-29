@@ -1,5 +1,3 @@
-# Название сценария
+# Загрузка данных из Yandex Managed Service for YDB в Yandex Managed Service for ClickHouse® с помощью Yandex Data Transfer
 
-Описание сценария и инструкция по его применению.
-
-Для практических руководств обязательна ссылка на документацию.
+С помощью сервиса [Data Transfer](https://yandex.cloud/ru/docs/data-transfer) вы можете загружать данные из базы данных [Managed Service for YDB](https://yandex.cloud/ru/docs/ydb) в кластер [Managed Service for ClickHouse®](https://yandex.cloud/ru/docs/managed-clickhouse). Настройка через Terraform описана в [практическом руководстве](https://yandex.cloud/ru/docs/data-transfer/tutorials/ydb-to-clickhouse), необходимый для настройки конфигурационный файл [ydb-to-clickhouse.tf](ydb-to-clickhouse.tf) расположен в этом репозитории.

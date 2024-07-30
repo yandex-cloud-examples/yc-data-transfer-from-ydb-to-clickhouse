@@ -162,7 +162,7 @@ resource "yandex_datatransfer_endpoint" "mch_target" {
   }
 }
 
-resource "yandex_datatransfer_transfer" "objstorage-ydb-transfer" {
+resource "yandex_datatransfer_transfer" "ydb-clickhouse-transfer" {
   description = "Transfer from the Managed Service for YDB to the Managed Service for ClickHouse® cluster"
   count       = local.transfer_enabled
   name        = local.transfer_name

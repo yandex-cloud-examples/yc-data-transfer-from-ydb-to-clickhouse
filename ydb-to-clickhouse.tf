@@ -10,7 +10,7 @@ locals {
   mch_password = "" # ClickHouse® user's password
 
   # Specify these settings ONLY AFTER the cluster is created. Then run the "terraform apply" command again.
-  transfer_enabled = 1 # Set to 1 to enable the transfer
+  transfer_enabled = 0 # Set to 1 to enable the transfer
 
   # The following settings are predefined. Change them only if necessary.
   network_name          = "mch-network"                     # Name of the network

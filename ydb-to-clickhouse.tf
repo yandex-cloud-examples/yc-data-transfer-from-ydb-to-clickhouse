@@ -115,17 +115,24 @@ resource "yandex_mdb_clickhouse_cluster" "clickhouse-cluster" {
     subnet_id        = yandex_vpc_subnet.mch-subnet-a.id
     assign_public_ip = true
   }
-
-  database {
-    name = local.mch_database_name
+  
+  lifecycle {
+    ignore_changes = [database, user,]
   }
+}
 
-  user {
-    name     = local.mch_username
-    password = local.mch_password
-    permission {
-      database_name = local.mch_database_name
-    }
+resource "yandex_mdb_clickhouse_database" "db" {
+  cluster_id = yandex_mdb_clickhouse_cluster.clickhouse-cluster.id
+  name       = local.mch_database_name
+}
+
+resource "yandex_mdb_clickhouse_user" "user" {
+  cluster_id = yandex_mdb_clickhouse_cluster.clickhouse-cluster.id
+  name       = local.mch_username
+  password   = local.mch_password
+
+  permission {
+    database_name = yandex_mdb_clickhouse_database.db.name
   }
 }
 

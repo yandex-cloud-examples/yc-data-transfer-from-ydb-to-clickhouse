@@ -1,4 +1,4 @@
-# Infrastructure for the Yandex Managed Service for YDB, Managed Service for ClickHouse®, and Data Transfer
+# Infrastructure for the Yandex Managed Service for YDB, Yandex Managed Service for ClickHouse®, and Yandex Data Transfer
 #
 # RU: https://yandex.cloud/ru/docs/data-transfer/tutorials/ydb-to-clickhouse
 # EN: https://yandex.cloud/en/docs/data-transfer/tutorials/ydb-to-clickhouse
@@ -94,7 +94,7 @@ resource "yandex_ydb_database_iam_binding" "ydb-editor" {
 
 # Infrastructure for the Managed Service for ClickHouse® cluster
 
-resource "yandex_mdb_clickhouse_cluster" "clickhouse-cluster" {
+resource "yandex_mdb_clickhouse_cluster_v2" "clickhouse-cluster" {
   description        = "Managed Service for ClickHouse® cluster"
   name               = local.mch_cluster_name
   environment        = "PRODUCTION"
@@ -102,32 +102,40 @@ resource "yandex_mdb_clickhouse_cluster" "clickhouse-cluster" {
   network_id         = yandex_vpc_network.mch-network.id
   security_group_ids = [yandex_vpc_security_group.mch-security-group.id]
 
-  clickhouse {
-    resources {
+  clickhouse = {
+    resources = {
       resource_preset_id = "s2.micro"
       disk_type_id       = "network-ssd"
       disk_size          = 10 # GB
     }
   }
-  host {
-    type             = "CLICKHOUSE"
-    zone             = "ru-central1-a"
-    subnet_id        = yandex_vpc_subnet.mch-subnet-a.id
-    assign_public_ip = true
+
+  hosts = {
+    "ch-host1" = {
+      type             = "CLICKHOUSE"
+      zone             = "ru-central1-a"
+      subnet_id        = yandex_vpc_subnet.mch-subnet-a.id
+      assign_public_ip = true
+      shard_name       = "shard1"
+    }
   }
-  
-  lifecycle {
-    ignore_changes = [database, user,]
+
+  shards = {
+    "shard1" = {}
+  }
+
+  maintenance_window {
+    type = "ANYTIME"
   }
 }
 
 resource "yandex_mdb_clickhouse_database" "db" {
-  cluster_id = yandex_mdb_clickhouse_cluster.clickhouse-cluster.id
+  cluster_id = yandex_mdb_clickhouse_cluster_v2.clickhouse-cluster.id
   name       = local.mch_database_name
 }
 
 resource "yandex_mdb_clickhouse_user" "user" {
-  cluster_id = yandex_mdb_clickhouse_cluster.clickhouse-cluster.id
+  cluster_id = yandex_mdb_clickhouse_cluster_v2.clickhouse-cluster.id
   name       = local.mch_username
   password   = local.mch_password
 
@@ -157,7 +165,7 @@ resource "yandex_datatransfer_endpoint" "mch_target" {
     clickhouse_target {
       connection {
         connection_options {
-          mdb_cluster_id = yandex_mdb_clickhouse_cluster.clickhouse-cluster.id
+          mdb_cluster_id = yandex_mdb_clickhouse_cluster_v2.clickhouse-cluster.id
           database       = local.mch_database_name
           user           = local.mch_username
           password {
